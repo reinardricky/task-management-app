@@ -1,0 +1,17 @@
+{
+  "name": "task-management-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install-all": "npm run install-frontend && npm run install-backend",
+    "install-frontend": "cd frontend && npm install",
+    "install-backend": "cd backend && yarn install",
+    "start-all": "npm run start-frontend & npm run start-backend",
+    "start-frontend": "cd frontend && npm run dev",
+    "start-backend": "cd backend && yarn start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
