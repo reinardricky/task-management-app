@@ -9,11 +9,8 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const token = localStorage.getItem("token");
       try {
-        const response = await api.get("/tasks", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await api.get("/task/me");
         setTasks(response.data);
       } catch (err) {
         setError("Failed to fetch tasks");
@@ -26,7 +23,7 @@ const DashboardPage: React.FC = () => {
   const handleAddTask = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await api.post("/tasks", { title: newTask });
+      await api.post("/task", { title: newTask });
       setNewTask("");
       // Refresh task list or append the new task to the state
     } catch (err) {

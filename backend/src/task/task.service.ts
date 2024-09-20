@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './task.entity';
@@ -38,19 +42,21 @@ export class TaskService {
    * Retrieve all task (admin-only)
    */
   async findAll(): Promise<Task[]> {
-    return this.taskRepository.find({
+    const tasks = await this.taskRepository.find({
       relations: ['user'], // Include the user information
     });
+    return tasks.length ? tasks : [];
   }
 
   /**
    * Retrieve task assigned to a specific user
    */
   async findTaskByUser(userId: string): Promise<Task[]> {
-    return this.taskRepository.find({
+    const tasks = await this.taskRepository.find({
       where: { user: { id: userId } }, // Filter by user ID
       relations: ['user'],
     });
+    return tasks.length ? tasks : [];
   }
 
   /**

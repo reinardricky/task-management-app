@@ -15,7 +15,9 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
     if (
       user &&
       user.password &&
@@ -27,8 +29,20 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.userId };
+  async login(user: { email: string; password: string }) {
+    const userEntity = await this.userRepository.findOne({
+      where: { email: user.email },
+    });
+
+    if (!userEntity) {
+      throw new Error('User not found');
+    }
+
+    const payload = {
+      email: userEntity.email,
+      roles: userEntity.roles,
+    };
+
     return {
       access_token: this.jwtService.sign(payload),
     };
