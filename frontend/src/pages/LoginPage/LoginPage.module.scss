@@ -17,45 +17,6 @@ form {
   align-items: center;
 }
 
-.inputForm {
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  border-radius: 4px;
-  padding: 0px 12px;
-  height: 56px;
-  margin-top: 24px;
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-}
-
-.inputForm > .label {
-  width: fit-content;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 12px;
-  color: rgba(0, 0, 0, 0.6);
-  background-color: #ffffff;
-  position: absolute;
-  top: -7px;
-  padding: 0px 5px;
-  left: 10px;
-}
-
-.inputForm > input {
-  height: 24px;
-  width: 100%;
-  font-size: 18px;
-  line-height: 24px;
-  border: none;
-  margin-top: 14px;
-  outline: none;
-  &:focus {
-    border: none;
-    outline: none;
-  }
-}
-
 form > button {
   margin-top: 32px;
   font-weight: 700;
