@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
+import api from "../../services/api";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
+import styles from "./LoginPage.module.scss";
 
 const LoginPage = () => {
+  const [isRegister, setIsRegister] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
   const navigate = useNavigate();
@@ -59,6 +62,10 @@ const LoginPage = () => {
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
     try {
       const response = await api.post("/auth/register", { email, password });
       // Redirect to login page
@@ -71,54 +78,65 @@ const LoginPage = () => {
   };
 
   const handleLoginGoogle = async () => {
-    try {
-      window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
-    } catch (err: any) {
-      setError(err.response.data.message);
-    }
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Login</button>
+    <div className={styles.LoginPage}>
+      <h1>{isRegister ? "Register" : "Login"}</h1>
+      <form onSubmit={isRegister ? handleRegister : handleLogin}>
+        <div className={styles.inputForm}>
+          <div className={styles.label}>Email</div>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div className={styles.inputForm}>
+          <div className={styles.label}>Password</div>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            required
+          />
+        </div>
+        {isRegister ? (
+          <div className={styles.inputForm}>
+            <div className={styles.label}>Confirm Password</div>
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm Password"
+              required
+            />
+          </div>
+        ) : null}
+        <button type="submit">{isRegister ? "Register" : "Login"}</button>
       </form>
       {error && <p>{error}</p>}
-      <h1>Register</h1>
-      {/* Implement registration form */}
-      <form onSubmit={handleRegister}>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          required
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          required
-        />
-        <button type="submit">Register</button>
-      </form>
-      <button onClick={handleLoginGoogle}>login google</button>
+      <p>or sign in with</p>
+      <button className={styles.loginGoogle} onClick={handleLoginGoogle}>
+        Sign in with Google
+      </button>
+      <p>
+        {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+        <span
+          onClick={() => setIsRegister(!isRegister)}
+          style={{
+            cursor: "pointer",
+            color: "blue",
+            textDecoration: "underline",
+          }}
+        >
+          {isRegister ? "Login" : "Register"}
+        </span>
+      </p>
     </div>
   );
 };

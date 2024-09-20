@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Task } from "../types";
-import api from "../services/api";
+import { Task } from "../../types";
+import api from "../../services/api";
 import { format } from "date-fns";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
