@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,7 +39,17 @@ export class AuthService {
     });
 
     if (!userEntity) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
+    }
+
+    if (userEntity.authProvider === 'local') {
+      const isPasswordValid = await bcrypt.compare(
+        user.password,
+        userEntity.password,
+      );
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Invalid password');
+      }
     }
 
     const payload = {
