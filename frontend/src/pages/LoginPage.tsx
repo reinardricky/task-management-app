@@ -12,14 +12,29 @@ const LoginPage = () => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      const token = Cookies.get("token");
+      let token = Cookies.get("token");
+
+      if (!token) {
+        const urlParams = new URLSearchParams(window.location.search);
+        token = urlParams.get("token") || "";
+        if (token) {
+          // Save token to cookies if found in URL
+          Cookies.set("token", token);
+        }
+      }
+
       if (token) {
-        // Check if login expired
-        const response = await api.get("/auth/verify", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (response.status === 200) {
-          navigate("/dashboard");
+        try {
+          // Check if login expired
+          const response = await api.get("/auth/verify", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.status === 200) {
+            navigate("/dashboard");
+          }
+        } catch (err) {
+          console.error("Token verification failed:", err);
+          setError("Session expired. Please log in again.");
         }
       }
     };
@@ -50,6 +65,14 @@ const LoginPage = () => {
       if (response.status === 201) {
         alert("User registered successfully");
       }
+    } catch (err: any) {
+      setError(err.response.data.message);
+    }
+  };
+
+  const handleLoginGoogle = async () => {
+    try {
+      window.location.href = `${import.meta.env.VITE_BACKEND_URL}/auth/google`;
     } catch (err: any) {
       setError(err.response.data.message);
     }
@@ -95,6 +118,7 @@ const LoginPage = () => {
         />
         <button type="submit">Register</button>
       </form>
+      <button onClick={handleLoginGoogle}>login google</button>
     </div>
   );
 };

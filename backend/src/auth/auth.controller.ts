@@ -1,11 +1,23 @@
-import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('google')
   @ApiOperation({ summary: 'Google OAuth2 login' })
@@ -19,9 +31,11 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'User successfully logged in.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' })
   @UseGuards(AuthGuard('google'))
-  googleAuthRedirect(@Req() req) {
-    // Handles Google redirect and return JWT or user info
-    return this.authService.login(req.user);
+  async googleAuthRedirect(@Req() req, @Res() res) {
+    const jwt = await this.authService.login(req.user);
+    res.redirect(
+      `${this.configService.get<string>('FRONTEND_URL')}?token=${jwt.access_token}`,
+    );
   }
 
   @Post('login')
