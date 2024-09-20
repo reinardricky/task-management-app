@@ -82,7 +82,6 @@ export class TaskController {
 
   /**
    * Endpoint to delete a task.
-   * Only the 'admin' role can delete task.
    */
   @UseGuards(JwtAuthGuard)
   @Delete(':id')

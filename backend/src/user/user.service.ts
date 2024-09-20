@@ -11,15 +11,27 @@ import { LoginUserDto } from './dto/login-user.dto'; // Adjust the path as neede
 import { UpdateUserDto } from './dto/update-user.dto'; // Adjust the path as needed
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
-  private readonly jwtSecret = process.env.JWT_SECRET || 'your_secret_key'; // Use an environment variable for the secret key
+  private readonly jwtSecret: string;
 
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.jwtSecret = this.configService.get<string>('JWT_SECRET');
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return this.userRepository.findOne({ where: { email } });
+  }
+
+  async create(user: User): Promise<User> {
+    return this.userRepository.save(user);
+  }
 
   async register(createUserDto: CreateUserDto): Promise<User> {
     const salt = await bcrypt.genSalt();
