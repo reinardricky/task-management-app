@@ -8,5 +8,5 @@ export interface Task {
   title: string;
   description?: string; // Optional field
   status: "To Do" | "In Progress" | "Done";
-  dueDate?: string; // Optional field
+  dueDate?: Date; // Optional field
 }
