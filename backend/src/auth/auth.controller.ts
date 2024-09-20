@@ -40,4 +40,11 @@ export class AuthController {
   async register(@Body() registerDto: { email: string; password: string }) {
     return this.authService.register(registerDto.email, registerDto.password);
   }
+
+  @Get('verify')
+  @ApiOperation({ summary: 'Verify JWT token' })
+  @UseGuards(AuthGuard('jwt'))
+  async verify(@Req() req) {
+    return req.user;
+  }
 }
