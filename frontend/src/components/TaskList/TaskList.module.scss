@@ -1,0 +1,37 @@
+.TaskList {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, auto);
+  gap: 24px;
+  margin-top: 24px;
+  .TaskCard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .description {
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+    &:hover {
+      transform: translateY(-4px);
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .TaskList {
+    grid-template-columns: 1fr;
+  }
+  
+}
