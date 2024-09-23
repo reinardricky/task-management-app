@@ -72,7 +72,6 @@ export class TaskController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   findMyTask(@Request() req) {
     const userId = req.user.userId;
-    console.log('userId', userId, req.user);
     return this.taskService.findTasksByUser(userId);
   }
 

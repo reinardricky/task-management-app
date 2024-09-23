@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import InputForm from '../../components/InputForm/InputForm';
 import SelectForm from '../../components/SelectForm/SelectForm';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,8 @@ import api from '../../services/api';
 import { STATUS_OPTIONS } from '../../constants/contants';
 import styles from './NewTaskPage.module.scss';
 import DefaultHeader from '../../components/DefaultHeader/DefaultHeader';
+import ReactSelect, { MultiValue } from 'react-select';
+import { UserOption } from '../../types';
 
 const NewTaskPage = () => {
   const [newTask, setNewTask] = useState({
@@ -13,15 +15,38 @@ const NewTaskPage = () => {
     description: '',
     status: '',
     dueDate: '',
-    user: [],
   });
+  const [users, setUsers] = useState<UserOption[]>([]);
+  const [allUsers, setAllUsers] = useState([]);
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await api.get('/user');
+        setAllUsers(response.data);
+      } catch (err) {
+        alert('Failed to fetch users');
+      }
+    };
+    fetchUsers();
+  }, []);
+
+  const handleUserChange = (selectedOptions: MultiValue<UserOption>) => {
+    setUsers(selectedOptions as UserOption[]);
+  };
+
   const handleAddTask = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      await api.post('/task', newTask);
+      const payload = {
+        ...newTask,
+        userIds: users.map((user) => user.value),
+      };
+
+      await api.post('/task', payload);
       alert('Task added successfully');
       navigate('/dashboard');
     } catch (err) {
@@ -66,6 +91,24 @@ const NewTaskPage = () => {
             placeholder="Select Status"
             options={STATUS_OPTIONS}
             required
+          />
+          <ReactSelect
+            styles={{
+              container: (provided) => ({
+                ...provided,
+                width: '100%',
+                maxWidth: '425px',
+                margin: '20px 0',
+              }),
+            }}
+            isMulti
+            value={users}
+            onChange={handleUserChange}
+            options={allUsers.map((user: { id: string; email: string }) => ({
+              value: user.id,
+              label: user.email,
+            }))}
+            placeholder="Select Users"
           />
           <button type="submit">Add Task</button>
         </form>

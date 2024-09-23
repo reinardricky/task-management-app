@@ -47,7 +47,7 @@ export class TaskService {
    */
   async findAll(): Promise<Task[]> {
     const tasks = await this.taskRepository.find({
-      relations: ['user'], // Include the user information
+      relations: ['users'], // Include the user information
     });
     return tasks.length ? tasks : [];
   }
@@ -68,10 +68,12 @@ export class TaskService {
    * Retrieve a specific task by ID, ensuring it's the user's task
    */
   async findOne(id: number): Promise<Task> {
-    const task = await this.taskRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
+    const task = await this.taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.users', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .where('task.id = :id', { id })
+      .getOne();
 
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
@@ -84,9 +86,25 @@ export class TaskService {
    * Update a task if the user owns it
    */
   async updateTask(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
-    const task = await this.findOne(id);
+    const task = await this.taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.users', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .where('task.id = :id', { id })
+      .getOne();
 
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    // Fetch users based on userIds
+    const users = await this.userRepository.findByIds(updateTaskDto.userIds);
+
+    // Assign users to the task
+    task.users = users;
+
+    // Update other task properties
     Object.assign(task, updateTaskDto);
+
     return this.taskRepository.save(task);
   }
 
@@ -94,6 +112,17 @@ export class TaskService {
    * Delete a task
    */
   async removeTask(id: number): Promise<void> {
+    const task = await this.taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.users', 'user')
+      .addSelect(['user.id', 'user.email'])
+      .where('task.id = :id', { id })
+      .getOne();
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
     const result = await this.taskRepository.delete(id);
 
     if (result.affected === 0) {

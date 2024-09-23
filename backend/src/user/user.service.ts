@@ -32,6 +32,8 @@ export class UserService {
   }
 
   async getAllUsers(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.userRepository.find({
+      select: ['id', 'email'],
+    });
   }
 }
