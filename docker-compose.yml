@@ -16,8 +16,10 @@ services:
     env_file:
       - .env
   db:
-    image: postgres:13
+    image: postgres:14
     environment:
-      POSTGRES_URL: ${DATABASE_URL}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: nestdb
     ports:
       - "5432:5432"

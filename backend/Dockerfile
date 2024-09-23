@@ -1,14 +1,14 @@
 # Dockerfile
 
 # Use Node.js as the base image
-FROM node:18-alpine
+FROM node:22-alpine
 
 # Set working directory
 WORKDIR /usr/src/app
 
 # Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN yarn install
 
 # Copy the rest of the application code
 COPY . .

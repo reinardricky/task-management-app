@@ -9,7 +9,7 @@ import { User } from './user.entity'; // Adjust the path as needed
 import { CreateUserDto } from './dto/create-user.dto'; // Adjust the path as needed
 import { LoginUserDto } from './dto/login-user.dto'; // Adjust the path as needed
 import { UpdateUserDto } from './dto/update-user.dto'; // Adjust the path as needed
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 
