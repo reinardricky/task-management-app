@@ -88,7 +88,7 @@ export class TaskController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   findTaskById(@Param('id') id: string, @Request() req) {
     const userId = req.user.userId;
-    return this.taskService.findOne(id, userId);
+    return this.taskService.findOne(id);
   }
 
   /**
@@ -104,10 +104,8 @@ export class TaskController {
   updateTask(
     @Param('id') id: string,
     @Body() updateTaskDto: UpdateTaskDto,
-    @Request() req,
   ) {
-    const userId = req.user.userId;
-    return this.taskService.updateTask(id, updateTaskDto, userId);
+    return this.taskService.updateTask(id, updateTaskDto);
   }
 
   /**

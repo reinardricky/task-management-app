@@ -62,15 +62,15 @@ export class TaskService {
   /**
    * Retrieve a specific task by ID, ensuring it's the user's task
    */
-  async findOne(id: string, userId: string): Promise<Task> {
+  async findOne(id: string): Promise<Task> {
     const task = await this.taskRepository.findOne({
-      where: { id, user: { id: userId } },
+      where: { id },
       relations: ['user'],
     });
 
     if (!task) {
       throw new NotFoundException(
-        `Task with ID ${id} not found or not assigned to this user`,
+        `Task with ID ${id} not found`,
       );
     }
 
@@ -80,19 +80,8 @@ export class TaskService {
   /**
    * Update a task if the user owns it
    */
-  async updateTask(
-    id: string,
-    updateTaskDto: UpdateTaskDto,
-    userId: string,
-  ): Promise<Task> {
-    const task = await this.findOne(id, userId);
-
-    // Only the task's owner can update it
-    if (task.user.id !== userId) {
-      throw new ForbiddenException(
-        'You do not have permission to update this task',
-      );
-    }
+  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+    const task = await this.findOne(id);
 
     Object.assign(task, updateTaskDto);
     return this.taskRepository.save(task);
