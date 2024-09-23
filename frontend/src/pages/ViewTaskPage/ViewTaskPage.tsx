@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Task } from '../../types';
 import api from '../../services/api';
 import DefaultHeader from '../../components/DefaultHeader/DefaultHeader';
@@ -13,6 +13,8 @@ const ViewTaskPage = () => {
   const { id } = useParams();
   const previousTaskRef = useRef<Task | null>(null);
   const [task, setTask] = useState<Task | null>(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTask = async () => {
@@ -34,10 +36,21 @@ const ViewTaskPage = () => {
     try {
       await api.patch(`/task/${id}`, task);
       alert('Task updated successfully');
+      navigate('/dashboard');
     } catch (err) {
       alert('Failed to update task');
     }
   }, [id, task]);
+
+  const handleDeleteTask = useCallback(async () => {
+    try {
+      await api.delete(`/task/${id}`);
+      alert('Task deleted successfully');
+      navigate('/dashboard');
+    } catch (err) {
+      alert('Failed to delete task');
+    }
+  }, [id]);
 
   return (
     <>
@@ -107,6 +120,9 @@ const ViewTaskPage = () => {
               }
             >
               Update Task
+            </button>
+            <button className={styles.deleteButton} onClick={handleDeleteTask}>
+              Delete Task
             </button>
           </>
         ) : (

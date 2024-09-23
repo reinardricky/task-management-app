@@ -13,4 +13,11 @@
   button {
     margin-top: 24px;    
   }
+  .deleteButton {
+    background-color: #ff0000;
+    color: #ffffff;
+    &:hover {
+      background-color: #ff3333;
+    }
+  }
 }
