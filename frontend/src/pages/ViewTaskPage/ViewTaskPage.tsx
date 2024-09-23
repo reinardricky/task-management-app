@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Task } from '../../types';
 import api from '../../services/api';
 import DefaultHeader from '../../components/DefaultHeader/DefaultHeader';
-import { format, formatDate } from 'date-fns';
+import { formatDate } from 'date-fns';
 import styles from './ViewTaskPage.module.scss';
 import InputForm from '../../components/InputForm/InputForm';
 import SelectForm from '../../components/SelectForm/SelectForm';
@@ -54,7 +54,7 @@ const ViewTaskPage = () => {
 
   return (
     <>
-      <DefaultHeader title="Task Details" />
+      <DefaultHeader title="Task Details" isHomeButton />
       <div className={styles.ViewTaskPage}>
         {task ? (
           <>
@@ -107,19 +107,20 @@ const ViewTaskPage = () => {
             <button
               onClick={handleUpdateTask}
               disabled={
-                // compare previous task and task
-                (previousTaskRef.current &&
-                  previousTaskRef.current.title === task.title &&
-                  previousTaskRef.current.description === task.description &&
-                  previousTaskRef.current.dueDate &&
-                  task.dueDate &&
-                  format(previousTaskRef.current.dueDate, 'yyyy-MM-dd') ===
-                    format(task.dueDate, 'yyyy-MM-dd') &&
-                  previousTaskRef.current.status === task.status) ||
-                false
+                JSON.stringify(previousTaskRef.current) === JSON.stringify(task)
               }
             >
               Update Task
+            </button>
+            <button
+              onClick={() => {
+                setTask(previousTaskRef.current);
+              }}
+              disabled={
+                JSON.stringify(previousTaskRef.current) === JSON.stringify(task)
+              }
+            >
+              Reset Task
             </button>
             <button className={styles.deleteButton} onClick={handleDeleteTask}>
               Delete Task

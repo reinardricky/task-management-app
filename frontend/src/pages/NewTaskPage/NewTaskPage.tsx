@@ -30,7 +30,7 @@ const NewTaskPage = () => {
   };
   return (
     <>
-      <DefaultHeader title="Add New Task" />
+      <DefaultHeader title="Add New Task" isHomeButton />
       <div className={styles.NewTaskPage}>
         <form onSubmit={handleAddTask}>
           <InputForm

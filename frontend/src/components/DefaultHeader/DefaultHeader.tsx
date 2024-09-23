@@ -4,9 +4,10 @@ import styles from './DefaultHeader.module.scss';
 
 interface DefaultHeaderProps {
   title: string;
+  isHomeButton?: boolean;
 }
 
-const DefaultHeader = ({ title }: DefaultHeaderProps) => {
+const DefaultHeader = ({ title, isHomeButton }: DefaultHeaderProps) => {
   const navigate = useNavigate();
   return (
     <header className={styles.DefaultHeader}>
@@ -20,6 +21,16 @@ const DefaultHeader = ({ title }: DefaultHeaderProps) => {
       >
         Logout
       </button>
+      {isHomeButton && (
+        <a
+          className={styles.home}
+          onClick={() => {
+            navigate('/dashboard');
+          }}
+        >
+          Home
+        </a>
+      )}
     </header>
   );
 };
