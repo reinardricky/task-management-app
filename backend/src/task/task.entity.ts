@@ -1,10 +1,16 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import { User } from '../user/user.entity';
 
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   title: string;
@@ -19,6 +25,7 @@ export class Task {
   dueDate: Date;
 
   // Many Task belong to one User
-  @ManyToOne(() => User, (user) => user.task, { eager: true }) // Define the inverse relationship
-  user: User; // The User who is assigned this task
+  @ManyToMany(() => User, (user) => user.tasks)
+  @JoinTable()
+  users: User[];
 }

@@ -1,10 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
 import { Task } from '../task/task.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column({ unique: true })
   email: string;
@@ -18,8 +18,9 @@ export class User {
   @Column({ default: 'local' }) // 'local' for regular login, 'google' for OAuth users
   authProvider: string;
 
-  @OneToMany(() => Task, (task) => task.user)
-  task: Task[];
+  // Many-to-Many relationship with Task
+  @ManyToMany(() => Task, (task) => task.users)
+  tasks: Task[];
 
   @Column('simple-array')
   roles: string[]; // e.g., ['admin', 'user']

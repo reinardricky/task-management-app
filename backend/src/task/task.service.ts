@@ -22,22 +22,26 @@ export class TaskService {
    */
   async createTask(
     createTaskDto: CreateTaskDto,
-    userId: string,
+    userIds: number[],
   ): Promise<Task> {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const { title, description, status, dueDate } = createTaskDto;
 
-    if (!user) {
-      throw new NotFoundException('User not found');
+    // Find users by their IDs
+    const users = await this.userRepository.findByIds(userIds);
+    if (!users.length) {
+      throw new NotFoundException('No valid users found for task assignment');
     }
 
     const task = this.taskRepository.create({
-      ...createTaskDto,
-      user, // Assign the task to the user
+      title,
+      description,
+      status,
+      dueDate,
+      users, // Assign the found users to the task
     });
 
     return this.taskRepository.save(task);
   }
-
   /**
    * Retrieve all task (admin-only)
    */
@@ -51,27 +55,26 @@ export class TaskService {
   /**
    * Retrieve task assigned to a specific user
    */
-  async findTaskByUser(userId: string): Promise<Task[]> {
-    const tasks = await this.taskRepository.find({
-      where: { user: { id: userId } }, // Filter by user ID
-      relations: ['user'],
-    });
-    return tasks.length ? tasks : [];
+  async findTasksByUser(userId: number): Promise<Task[]> {
+    // Find tasks where the user is part of the assigned users
+    return this.taskRepository
+      .createQueryBuilder('task')
+      .leftJoinAndSelect('task.users', 'user')
+      .where('user.id = :userId', { userId })
+      .getMany();
   }
 
   /**
    * Retrieve a specific task by ID, ensuring it's the user's task
    */
-  async findOne(id: string): Promise<Task> {
+  async findOne(id: number): Promise<Task> {
     const task = await this.taskRepository.findOne({
       where: { id },
       relations: ['user'],
     });
 
     if (!task) {
-      throw new NotFoundException(
-        `Task with ID ${id} not found`,
-      );
+      throw new NotFoundException(`Task with ID ${id} not found`);
     }
 
     return task;
@@ -80,7 +83,7 @@ export class TaskService {
   /**
    * Update a task if the user owns it
    */
-  async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  async updateTask(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const task = await this.findOne(id);
 
     Object.assign(task, updateTaskDto);
@@ -90,11 +93,31 @@ export class TaskService {
   /**
    * Delete a task
    */
-  async removeTask(id: string): Promise<void> {
+  async removeTask(id: number): Promise<void> {
     const result = await this.taskRepository.delete(id);
 
     if (result.affected === 0) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
+  }
+
+  // Assign multiple users to a task
+  async assignUsersToTask(taskId: number, userIds: number[]): Promise<Task> {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['users'],
+    });
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    // Find all users by their IDs
+    const users = await this.userRepository.findByIds(userIds);
+    if (!users.length) {
+      throw new NotFoundException('No users found');
+    }
+
+    task.users = users; // Assign multiple users to the task
+    return this.taskRepository.save(task);
   }
 }

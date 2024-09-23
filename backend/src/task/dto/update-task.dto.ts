@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsArray, IsOptional, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateTaskDto {
@@ -20,4 +20,8 @@ export class UpdateTaskDto {
   @IsOptional()
   @IsString()
   status?: string;  // Could be 'To Do', 'In Progress', 'Done', etc.
+
+  @IsOptional()
+  @IsArray()
+  userIds?: number[];
 }

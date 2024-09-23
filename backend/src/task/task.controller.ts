@@ -37,9 +37,9 @@ export class TaskController {
   @ApiResponse({ status: 201, description: 'Task created successfully.' })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  createTask(@Body() createTaskDto: CreateTaskDto, @Request() req) {
-    const userId = req.user.userId;
-    return this.taskService.createTask(createTaskDto, userId);
+  createTask(@Body() createTaskDto: CreateTaskDto) {
+    const { userIds, ...taskDetails } = createTaskDto;
+    return this.taskService.createTask(taskDetails, userIds);
   }
 
   /**
@@ -61,8 +61,7 @@ export class TaskController {
    * Endpoint to get task assigned to the authenticated user.
    * Both 'user' and 'admin' roles can access this.
    */
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'user')
+  @UseGuards(JwtAuthGuard)
   @Get('me')
   @ApiOperation({ summary: 'Get my tasks' })
   @ApiResponse({
@@ -73,7 +72,8 @@ export class TaskController {
   @ApiResponse({ status: 403, description: 'Forbidden.' })
   findMyTask(@Request() req) {
     const userId = req.user.userId;
-    return this.taskService.findTaskByUser(userId);
+    console.log('userId', userId, req.user);
+    return this.taskService.findTasksByUser(userId);
   }
 
   /**
@@ -86,8 +86,7 @@ export class TaskController {
   @ApiResponse({ status: 200, description: 'Return the task.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  findTaskById(@Param('id') id: string, @Request() req) {
-    const userId = req.user.userId;
+  findTaskById(@Param('id') id: number, @Request() req) {
     return this.taskService.findOne(id);
   }
 
@@ -101,10 +100,7 @@ export class TaskController {
   @ApiResponse({ status: 200, description: 'Task updated successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  updateTask(
-    @Param('id') id: string,
-    @Body() updateTaskDto: UpdateTaskDto,
-  ) {
+  updateTask(@Param('id') id: number, @Body() updateTaskDto: UpdateTaskDto) {
     return this.taskService.updateTask(id, updateTaskDto);
   }
 
@@ -117,7 +113,23 @@ export class TaskController {
   @ApiResponse({ status: 200, description: 'Task deleted successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   @ApiResponse({ status: 403, description: 'Forbidden.' })
-  removeTask(@Param('id') id: string) {
+  removeTask(@Param('id') id: number) {
     return this.taskService.removeTask(id);
+  }
+  /**
+   * Endpoint to assign users to a task.
+   * Only authenticated user can assign users to a task.
+   */
+  @UseGuards(JwtAuthGuard)
+  @Patch(':taskId/assign')
+  @ApiOperation({ summary: 'Assign users to a task' })
+  @ApiResponse({ status: 200, description: 'Users assigned to the task.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  async assignUsers(
+    @Param('taskId') taskId: number,
+    @Body('userIds') userIds: number[],
+  ) {
+    return this.taskService.assignUsersToTask(taskId, userIds);
   }
 }
