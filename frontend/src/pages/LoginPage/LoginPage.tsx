@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
@@ -14,69 +14,86 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const verifyToken = async () => {
-      let token = Cookies.get('token');
+  const verifyToken = useCallback(async () => {
+    let token = Cookies.get('token');
 
-      if (!token) {
-        const urlParams = new URLSearchParams(window.location.search);
-        token = urlParams.get('token') || '';
-        if (token) {
-          // Save token to cookies if found in URL
-          Cookies.set('token', token);
-        }
-      }
-
+    if (!token) {
+      const urlParams = new URLSearchParams(window.location.search);
+      token = urlParams.get('token') || '';
       if (token) {
-        try {
-          // Check if login expired
-          const response = await api.get('/auth/verify', {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          if (response.status === 200) {
-            navigate('/dashboard');
-          }
-        } catch (err) {
-          console.error('Token verification failed:', err);
-          alert('Session expired. Please log in again.');
+        // Save token to cookies if found in URL
+        Cookies.set('token', token);
+      }
+    }
+
+    if (token) {
+      try {
+        // Check if login expired
+        const response = await api.get('/auth/verify', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.status === 200) {
+          navigate('/dashboard');
         }
+      } catch (err) {
+        console.error('Token verification failed:', err);
+        alert('Session expired. Please log in again.');
       }
-    };
+    }
+  }, [navigate]);
+
+  useEffect(() => {
     verifyToken();
-  }, []);
+  }, [verifyToken]);
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      Cookies.set('token', response.data.access_token); // Store JWT
-      // Redirect to dashboard (implement with useNavigate)
-      if (response.status === 201) {
-        alert('User logged in successfully');
-        // Navigate to dashboard
+  // Memoize values to prevent unnecessary re-renders
+  const memoizedEmail = useMemo(() => email, [email]);
+  const memoizedPassword = useMemo(() => password, [password]);
+  const memoizedConfirmPassword = useMemo(
+    () => confirmPassword,
+    [confirmPassword],
+  );
+
+  const handleLogin = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      try {
+        const response = await api.post('/auth/login', {
+          email: memoizedEmail,
+          password: memoizedPassword,
+        });
+        if (response.status === 201) {
+          alert('Login successful');
+          Cookies.set('token', response.data.access_token);
+          navigate('/dashboard');
+        }
+      } catch (err: any) {
+        alert(err.response.data.message);
+      }
+    },
+    [memoizedEmail, memoizedPassword, navigate],
+  );
+
+  const handleRegister = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (memoizedPassword !== memoizedConfirmPassword) {
+        alert('Passwords do not match');
+        return;
+      }
+      try {
+        const response = await api.post('/auth/register', {
+          email: memoizedEmail,
+          password: memoizedPassword,
+        });
+        Cookies.set('token', response.data.token);
         navigate('/dashboard');
+      } catch (err: any) {
+        alert(err.response.data.message);
       }
-    } catch (err: any) {
-      alert(err.response.data.message);
-    }
-  };
-
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-    try {
-      const response = await api.post('/auth/register', { email, password });
-      // Redirect to login page
-      if (response.status === 201) {
-        alert('User registered successfully');
-      }
-    } catch (err: any) {
-      alert(err.response.data.message);
-    }
-  };
+    },
+    [memoizedEmail, memoizedPassword, memoizedConfirmPassword, navigate],
+  );
 
   return (
     <div className={styles.LoginPage}>
