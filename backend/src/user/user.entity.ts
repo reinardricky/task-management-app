@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 import { Task } from '../task/task.entity';
+import { Comment } from 'src/comment/comment.entity';
 
 @Entity()
 export class User {
@@ -24,4 +25,7 @@ export class User {
 
   @Column('simple-array')
   roles: string[]; // e.g., ['admin', 'user']
+
+  @OneToMany(() => Comment, (comment) => comment.user)
+  comments: Comment[];
 }

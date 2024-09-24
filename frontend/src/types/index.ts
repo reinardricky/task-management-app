@@ -15,3 +15,11 @@ export interface UserOption {
   value: string;
   label: string;
 }
+
+export interface Comment {
+  id: number;
+  user: {
+    email: string;
+  };
+  content: string;
+}

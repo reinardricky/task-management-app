@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { Task } from './task/task.entity';
 import { User } from './user/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CommentModule } from './comment/comment.module';
+import { Comment } from './comment/comment.entity';
 
 @Module({
   imports: [
@@ -18,13 +20,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.get<string>('DATABASE_URL'),
-        entities: [User, Task],
+        entities: [User, Task, Comment],
         synchronize: true,
       }),
     }),
     TaskModule,
     UserModule,
     AuthModule,
+    CommentModule,
   ],
 })
 export class AppModule {}

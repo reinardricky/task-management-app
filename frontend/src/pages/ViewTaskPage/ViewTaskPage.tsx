@@ -9,6 +9,7 @@ import InputForm from '../../components/InputForm/InputForm';
 import SelectForm from '../../components/SelectForm/SelectForm';
 import { STATUS_OPTIONS } from '../../constants/contants';
 import ReactSelect, { MultiValue } from 'react-select';
+import CommentSection from '../../components/CommentSection/CommentSection';
 
 const ViewTaskPage = () => {
   const { id } = useParams();
@@ -195,6 +196,7 @@ const ViewTaskPage = () => {
             <button className={styles.deleteButton} onClick={handleDeleteTask}>
               Delete Task
             </button>
+            {id ? <CommentSection taskId={Number(id)} /> : null}
           </>
         ) : (
           <p>Loading...</p>
