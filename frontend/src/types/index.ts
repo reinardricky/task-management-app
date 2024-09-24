@@ -23,3 +23,14 @@ export interface Comment {
   };
   content: string;
 }
+
+export interface User {
+  id: number;
+  email: string;
+}
+
+export interface UserContextType {
+  user: User | null;
+  setUser: (user: User | null) => void;
+  fetchUser: () => Promise<void>;
+}

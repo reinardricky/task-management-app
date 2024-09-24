@@ -9,12 +9,14 @@ import { Task } from './task.entity';
 import { User } from '../user/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto'; // DTO for task creation
 import { UpdateTaskDto } from './dto/update-task.dto'; // DTO for task update
+import { NotificationGateway } from 'src/notification/notification.gateway';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private taskRepository: Repository<Task>, // Inject Task repository
     @InjectRepository(User) private userRepository: Repository<User>, // Inject User repository
+    private notificationGateway: NotificationGateway,
   ) {}
 
   /**
@@ -38,6 +40,11 @@ export class TaskService {
       status,
       dueDate,
       users, // Assign the found users to the task
+    });
+
+    // Send notification to each assigned user
+    userIds.forEach((userId) => {
+      this.notificationGateway.sendTaskAssignmentNotification(userId, task);
     });
 
     return this.taskRepository.save(task);
@@ -104,6 +111,11 @@ export class TaskService {
 
     // Update other task properties
     Object.assign(task, updateTaskDto);
+
+    // Send notification to each assigned user
+    updateTaskDto.userIds.forEach((userId) => {
+      this.notificationGateway.sendTaskAssignmentNotification(userId, task);
+    });
 
     return this.taskRepository.save(task);
   }

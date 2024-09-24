@@ -8,6 +8,7 @@ import { User } from './user/user.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommentModule } from './comment/comment.module';
 import { Comment } from './comment/comment.entity';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { Comment } from './comment/comment.entity';
     UserModule,
     AuthModule,
     CommentModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

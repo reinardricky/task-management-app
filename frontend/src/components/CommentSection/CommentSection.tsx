@@ -25,6 +25,7 @@ const CommentSection = ({ taskId }: { taskId: number }) => {
     try {
       await api.post('/comments', { content: addComment, taskId });
       fetchComments();
+      setAddComment('');
       alert('Comment added successfully');
     } catch (err) {
       alert('Failed to add comment');
