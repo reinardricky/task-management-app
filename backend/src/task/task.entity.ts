@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { User } from '../user/user.entity';
-import { Comment } from 'src/comment/comment.entity';
+import { Comment } from '../comment/comment.entity';
 
 @Entity()
 export class Task {

@@ -8,6 +8,7 @@ import {
   Body,
   Param,
   Request,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -25,6 +26,12 @@ import {
 @ApiTags('Task')
 @Controller('task')
 export class TaskController {
+  create(createTaskDto: CreateTaskDto): any {
+    throw new Error('Method not implemented.');
+  }
+  findAll(): any {
+    throw new Error('Method not implemented.');
+  }
   constructor(private taskService: TaskService) {}
 
   /**

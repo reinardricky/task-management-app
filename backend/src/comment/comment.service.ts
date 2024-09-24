@@ -5,7 +5,7 @@ import { Comment } from './comment.entity';
 import { User } from '../user/user.entity';
 import { Task } from '../task/task.entity';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { NotificationGateway } from 'src/notification/notification.gateway';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @Injectable()
 export class CommentService {

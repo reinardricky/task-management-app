@@ -9,7 +9,7 @@ import { Task } from './task.entity';
 import { User } from '../user/user.entity';
 import { CreateTaskDto } from './dto/create-task.dto'; // DTO for task creation
 import { UpdateTaskDto } from './dto/update-task.dto'; // DTO for task update
-import { NotificationGateway } from 'src/notification/notification.gateway';
+import { NotificationGateway } from '../notification/notification.gateway';
 
 @Injectable()
 export class TaskService {

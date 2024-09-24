@@ -5,7 +5,7 @@ import { CommentController } from './comment.controller';
 import { Comment } from './comment.entity';
 import { Task } from '../task/task.entity';
 import { User } from '../user/user.entity';
-import { NotificationModule } from 'src/notification/notification.module';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
   imports: [
